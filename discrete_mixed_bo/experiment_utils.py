@@ -63,6 +63,8 @@ from discrete_mixed_bo.problems.base import (
     DiscreteTestProblem,
     DiscretizedBotorchTestProblem,
 )
+
+from discrete_mixed_bo.problems.adhesive_bonding.adhesive_bonding import AdhesiveBonding
 from discrete_mixed_bo.problems.binary import LABS, Contamination
 from discrete_mixed_bo.problems.cco.cco import CCO
 from discrete_mixed_bo.problems.chemistry import Chemistry
@@ -721,6 +723,11 @@ def get_problem(name: str, dim: Optional[int] = None, **kwargs) -> DiscreteTestP
         )
     elif name == "welded_beam":
         return WeldedBeam(
+            negate=True,
+            continuous=kwargs.get("continuous", False),
+        )
+    elif name == "adhesive_bonding":
+        return AdhesiveBonding(
             negate=True,
             continuous=kwargs.get("continuous", False),
         )

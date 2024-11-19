@@ -2,6 +2,7 @@
 import matlab.engine
 import torch
 from discrete_mixed_bo import optimize_function, get_experiment_config  # Import necessary functions from bo_pr
+from discrete_mixed_bo.problems.base import DiscreteTestProblem
 
 # Start MATLAB engine
 eng = matlab.engine.start_matlab()
@@ -50,6 +51,9 @@ def run_experiment():
     finally:
         # Stop MATLAB engine after running the experiment to ensure cleanup
         eng.quit()
+
+class AdhesiveBonding(DiscreteTestProblem):
+    pass
 
 # If executed as main script, run the experiment
 if __name__ == "__main__":
