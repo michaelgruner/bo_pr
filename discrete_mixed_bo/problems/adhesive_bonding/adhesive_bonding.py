@@ -61,7 +61,7 @@ class AdhesiveBonding(DiscreteTestProblem):
             ]
 
         integer_indices = extract_indices(self._bounds, named_bounds, "integer")
-        categorical_indices = extract_indices(self._bounds, named_bounds, "integer")
+        categorical_indices = extract_indices(self._bounds, named_bounds, "categorical")
         # Continuous indices will be automatically deducted by the base class
 
         super().__init__(noise_std, negate, integer_indices, categorical_indices)
