@@ -13,8 +13,9 @@ requirements = [
     "scipy",
     "jupyter",
     "matplotlib",
+    "matlabengine",
     "nevergrad",
-    "sklearn",
+    "scikit-learn",
     "statsmodels",
     "xgboost",
 ]
