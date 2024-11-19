@@ -7,32 +7,6 @@ from discrete_mixed_bo.problems.base import DiscreteTestProblem
 # Start MATLAB engine
 eng = matlab.engine.start_matlab()
 
-# Define the experiment in bo_pr
-def run_experiment():
-    try:
-        # Get experiment configuration for adhesive bonding
-        experiment_config = get_experiment_config("adhesive_bonding")
-
-        # Set up bounds for the adhesive bonding problem based on experiment configuration
-        bounds = torch.tensor(experiment_config['bounds'])
-
-        # Define an initial dataset if provided in the experiment configuration
-        initial_data = torch.tensor(experiment_config['initial_data']) if 'initial_data' in experiment_config else torch.rand(10, len(bounds))  # Example: 10 initial points
-
-        # Run Bayesian optimization using bo_pr
-        result = optimize_function(
-            evaluate_adhesive_bonding,  # Objective function
-            bounds=bounds,  # Bounds for each parameter
-            initial_data=initial_data,  # Initial dataset
-            num_iterations=experiment_config.get('num_iterations', 100)  # Number of iterations to run
-        )
-
-        # Output the final result
-        print("Optimization result:", result)
-    finally:
-        # Stop MATLAB engine after running the experiment to ensure cleanup
-        eng.quit()
-
 class AdhesiveBonding(DiscreteTestProblem):
 
     def __init__(
