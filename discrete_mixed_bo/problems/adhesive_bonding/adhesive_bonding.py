@@ -20,43 +20,38 @@ class AdhesiveBonding(DiscreteTestProblem):
         self._named_bounds = bounds
 
         # Build the bounds array using only the bounds member, discarding the fixed values
-        self._bounds = [
-            item["bounds"]
-            for key, item in named_bounds.items()
-            if item["type"] in {"integer", "categorical", "continuous"}
-        ]
+        self._bounds = []
+        integer_indices = []
+        categorical_indices = []
 
-        def extract_indices(bounds, named_bounds, of_type):
-            return [
-                idx
-                for idx, item in enumerate(bounds)
-                if any(
-                        bound_item["bounds"] == item and bound_item["type"] == of_type
-                        for bound_item in named_bounds.values()
-                )
-            ]
+        for key, item in self._named_bounds.items():
+            if item["type"] in ["integer", "categorical", "continuous"]:
+                index = len(self._bounds)
+                self._bounds.append(item["bounds"])
 
-        integer_indices = extract_indices(self._bounds, named_bounds, "integer")
-        categorical_indices = extract_indices(self._bounds, named_bounds, "categorical")
-        print(f'{integer_indices=}')
-        print(f'{categorical_indices=}')
+                if item["type"] == "integer":
+                    integer_indices.append(index)
+                elif item["type"] == "categorical":
+                    categorical_indices.append(index)
+
         # Continuous indices will be automatically deducted by the base class
 
         super().__init__(noise_std, negate, integer_indices, categorical_indices)
 
     def evaluate_true(self, X: Tensor) -> Tensor:
         # Convert input to MATLAB compatible format (assuming x is a list of input variables)
+
         x_matlab = matlab.double(X.tolist())
 
         # Same ordering as the instantiation
         curing_time, ind_current_bonding, plasma_distance, Plasma_passes, plasma_power, plasma_speed, time_between_plasma_glue, wt_particles, curing_method, compressed_air, degreasing, dry_tissue, US_bath, glue_type, material, Plasma, pretreatment, roughening, noise_curing, posttreatment = x_matlab
 
         # Map categorical values
-        curing_method = self._named_bounds['curing_method']['mapping'][curing_method]
-        glue_type = self._named_bounds['glue_type']['mapping'][glue_type]
-        material = self._named_bounds['material']['mapping'][material]
+        curing_method = self._named_bounds['curing_method']['mapping'][int(curing_method)]
+        glue_type = self._named_bounds['glue_type']['mapping'][int(glue_type)]
+        material = self._named_bounds['material']['mapping'][int(material)]
         #order = self._named_bounds['order']['mapping'][order]
-        noise_curing = self._named_bounds['noise_curing']['mapping'][noise_curing]
+        noise_curing = self._named_bounds['noise_curing']['mapping'][int(noise_curing)]
 
         # Fixed values
         batch_size = self._named_bounds["batch_size"]["bounds"]
