@@ -15,9 +15,9 @@ class AdhesiveBonding(DiscreteTestProblem):
         self,
         noise_std: Optional[float] = None,
         negate: bool = False,
-        named_bounds: dict = {}
+        bounds: dict = {}
     ) -> None:
-        self._named_bounds = named_bounds
+        self._named_bounds = bounds
 
         # Build the bounds array using only the bounds member, discarding the fixed values
         self._bounds = [

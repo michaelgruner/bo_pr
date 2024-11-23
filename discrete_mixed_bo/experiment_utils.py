@@ -729,7 +729,7 @@ def get_problem(name: str, dim: Optional[int] = None, **kwargs) -> DiscreteTestP
     elif name == "adhesive_bonding":
         return AdhesiveBonding(
             negate=True,
-            continuous=kwargs.get("continuous", False),
+            bounds=kwargs.get("bounds", {}),
         )
     else:
         raise ValueError(f"Unknown function name: {name}!")
