@@ -1,6 +1,8 @@
 # Import required modules
-import matlab
+import matlab.engine
 import torch
+from torch import Tensor
+from typing import Optional
 
 from discrete_mixed_bo.problems.base import DiscreteTestProblem
 
@@ -13,7 +15,7 @@ class AdhesiveBonding(DiscreteTestProblem):
         self,
         noise_std: Optional[float] = None,
         negate: bool = False,
-        named_bounds: Dict = {}
+        named_bounds: dict = {}
     ) -> None:
         self._named_bounds = named_bounds
 
@@ -36,6 +38,8 @@ class AdhesiveBonding(DiscreteTestProblem):
 
         integer_indices = extract_indices(self._bounds, named_bounds, "integer")
         categorical_indices = extract_indices(self._bounds, named_bounds, "categorical")
+        print(f'{integer_indices=}')
+        print(f'{categorical_indices=}')
         # Continuous indices will be automatically deducted by the base class
 
         super().__init__(noise_std, negate, integer_indices, categorical_indices)
