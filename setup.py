@@ -8,8 +8,8 @@ from setuptools import find_packages, setup
 
 requirements = [
     "torch",
-    "gpytorch",
-    "botorch>=0.6",
+    "gpytorch==1.9.1",
+    "botorch==0.8.1",
     "scipy",
     "jupyter",
     "matplotlib",
