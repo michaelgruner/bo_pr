@@ -168,10 +168,7 @@
         "description": "a parameter to indicate whether roughening treamtent is used or not."
       },
       "batch_size": {
-        "bounds": [
-          30,
-          30
-        ],
+        "bounds": 30,
         "type": "fixed",
         "description": "no. of samples per batch"
       },
@@ -244,6 +241,21 @@
         ],
         "type": "integer",
         "description": "a parameter to indicate whether posttreatment after roughening treatment is used or not"
+      },
+      "ind_current_debonding": {
+          "bounds": [5, 30],
+          "type":  "continuous",
+          "description": "induction curren [A] allowable range = 5-30 A"
+      },
+      "ind_time_debonding": {
+        "bounds": [1, 600],
+        "type": "continuous",
+        "description": "time induction current is applied during debonding [s], allowable range = 1-600 s"
+      },
+      "order": {
+        "bounds": [1, 6],
+        "type": "integer",
+        "description:": "number indicating the sequence of pretreatment and treatment scenarios. is it automatically calculated based on the input sequence in the main file. It is no longer an input parameter can be fixed to 3 and 6, but we need to know why this needs to be reduced"
       }
     }
   }

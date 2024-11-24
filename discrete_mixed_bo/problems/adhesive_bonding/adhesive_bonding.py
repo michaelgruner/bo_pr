@@ -3,6 +3,7 @@ import matlab.engine
 import torch
 from torch import Tensor
 from typing import Optional
+import sys
 
 from discrete_mixed_bo.problems.base import DiscreteTestProblem
 
@@ -49,38 +50,54 @@ class AdhesiveBonding(DiscreteTestProblem):
             x_matlab = matlab.double(Xi.tolist())
 
             # Same ordering as the instantiation
-            curing_time, ind_current_bonding, plasma_distance, Plasma_passes, plasma_power, plasma_speed, time_between_plasma_glue, wt_particles, curing_method, compressed_air, degreasing, dry_tissue, US_bath, glue_type, material, Plasma, pretreatment, roughening, noise_curing, posttreatment = x_matlab[0]
+            curing_time, ind_current_bonding, plasma_distance, Plasma_passes, plasma_power, plasma_speed, time_between_plasma_glue, wt_particles, curing_method, compressed_air, degreasing, dry_tissue, US_bath, glue_type, material, Plasma, pretreatment, roughening, noise_curing, posttreatment, ind_current_debonding, ind_time_debonding, order = np.float64(x_matlab[0])[0]
 
             # Map categorical values
             curing_method = self._named_bounds['curing_method']['mapping'][int(curing_method)]
             glue_type = self._named_bounds['glue_type']['mapping'][int(glue_type)]
             material = self._named_bounds['material']['mapping'][int(material)]
             #order = self._named_bounds['order']['mapping'][order]
-            noise_curing = self._named_bounds['noise_curing']['mapping'][int(noise_curing)]
+            noise_curing = float(self._named_bounds['noise_curing']['mapping'][int(noise_curing)])
 
             # Fixed values
-            batch_size = self._named_bounds["batch_size"]["bounds"]
-            cooling_time = self._named_bounds["cooling_time"]["bounds"]
-            curing_temperature = self._named_bounds["curing_temperature"]["bounds"]
-            general_noise = self._named_bounds["general_noise"]["bounds"]
-            noise_factor_plasma = self._named_bounds["noise_factor_plasma"]["bounds"]
-            noise_material = self._named_bounds["noise_material"]["bounds"]
-            noise_temp = self._named_bounds["noise_temp"]["bounds"]
-            number_repetitions = self._named_bounds["number_repetitions"]["bounds"]
-            sample_size = self._named_bounds["sample_size"]["bounds"]
-            T_room = self._named_bounds["T_room"]["bounds"]
-            Width_plasma = self._named_bounds["Width_plasma"]["bounds"]
+            batch_size = float(self._named_bounds["batch_size"]["bounds"])
+            cooling_time = float(self._named_bounds["cooling_time"]["bounds"])
+            curing_temperature = float(self._named_bounds["curing_temperature"]["bounds"])
+            general_noise = float(self._named_bounds["general_noise"]["bounds"])
+            noise_factor_plasma = float(self._named_bounds["noise_factor_plasma"]["bounds"])
+            noise_material = float(self._named_bounds["noise_material"]["bounds"])
+            noise_temp = float(self._named_bounds["noise_temp"]["bounds"])
+            number_repetitions = float(self._named_bounds["number_repetitions"]["bounds"])
+            sample_size = float(self._named_bounds["sample_size"]["bounds"])
+            T_room = float(self._named_bounds["T_room"]["bounds"])
+            Width_plasma = float(self._named_bounds["Width_plasma"]["bounds"])
 
-            # Call the main MATLAB function (e.g., bondingModel2) that evaluates the process
-            tensile_strength, failure_mode, visual_quality, cost, feasibility, final_contact_angle = eng.bondingModel2(
+            try:
+                # Call the main MATLAB function (e.g., bondingModel2) that evaluates the process
+                tensile_strength, failure_mode, visual_quality, cost, feasibility, final_contact_angle = eng.bondingModel2(
                 pretreatment, posttreatment, material, dry_tissue, compressed_air, US_bath, degreasing, roughening, glue_type,
                 sample_size, Plasma, plasma_power, plasma_speed, plasma_distance, Plasma_passes, time_between_plasma_glue,
                 curing_time, curing_temperature, batch_size, number_repetitions, Width_plasma, general_noise,
-                noise_factor_plasma, noise_curing, noise_material, wt_particles, curing_method, ind_current_bonding
-            )
+                noise_factor_plasma, noise_curing, noise_material, wt_particles, curing_method, ind_current_bonding,
+                ind_current_debonding, ind_time_debonding, order
+                )
+
+            except matlab.engine.MatlabExecutionError as e:
+                print("\nError running Matlab simulation:", file=sys.stderr)
+                print("vvvvvvvvvvvvvvvvvvvvvvvvv", file=sys.stderr)
+                print(e, file=sys.stderr)
+                print("^^^^^^^^^^^^^^^^^^^^^^^^^", file=sys.stderr)
+                continue
+            except TypeError as e:
+                print("\nError unpacking Matlab outputs (probably a Matlab premature return):", file=sys.stderr)
+                print("vvvvvvvvvvvvvvvvvvvvvvvvv", file=sys.stderr)
+                print(e, file=sys.stderr)
+                print("^^^^^^^^^^^^^^^^^^^^^^^^^", file=sys.stderr)
+                continue
 
             # Return only the tensile strength as the objective to be optimized
             Y.append(tensile_strength)
+
 
         return torch.tensor(
             Y,
