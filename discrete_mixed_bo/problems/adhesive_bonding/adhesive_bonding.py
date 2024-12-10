@@ -1,5 +1,6 @@
 # Import required modules
 import matlab.engine
+import numpy as np
 import torch
 from torch import Tensor
 from typing import Optional
